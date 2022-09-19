@@ -1,13 +1,19 @@
+const fs = require('fs');
 // 서버를 띄우기 위한 기본 셋팅
 const express = require("express"); //express 라이브러리 셋팅
 const app = express(); //객체 만들기
 const bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({ extended: true }))
+const MongoClient = require('mongodb').MongoClient
 
-app.listen(8080, function () {
-	// 포트번호, 띄운 후 실행할 코드
-	console.log("listening on 8080"); // 8080 port로 웹서버를 만들고 들어오면 해당 문장 실행
-});
+const jsonfile = fs.readFileSync('./password.json');
+const password = JSON.parse(jsonfile).value;
+MongoClient.connect('mongodb+srv://hyeonuk:' + password + '@cluster0.2onwa9n.mongodb.net/?retryWrites=true&w=majority', function (에러, client) {
+	if (에러) return console.log(에러)
+	app.listen(8080, function () {
+		console.log('listening on 8080')
+	})
+})
 
 // 누군가 /pet으로 방문하면 pet관련된 안내문을 띄워주자.
 app.get("/pet", function (요청, 응답) {
@@ -26,6 +32,8 @@ app.get("/write", function (요청, 응답) {
 });
 
 app.post('/add', function (요청, 응답) {
-	console.log(요청.body);
+	console.log(요청.body.title);
+	console.log(요청.body.date);
 	응답.send('전송완료')
 });
+
