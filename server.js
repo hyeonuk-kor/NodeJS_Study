@@ -5,23 +5,18 @@ const app = express(); //객체 만들기
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: true }));
 const MongoClient = require("mongodb").MongoClient;
+app.set('view engine', 'ejs');
 
 const jsonfile = fs.readFileSync("./password.json");
 const password = JSON.parse(jsonfile).value;
 let db;
 MongoClient.connect(
 	"mongodb+srv://hyeonuk:" +
-		password +
-		"@cluster0.2onwa9n.mongodb.net/?retryWrites=true&w=majority",
+	password +
+	"@cluster0.2onwa9n.mongodb.net/?retryWrites=true&w=majority",
 	function (에러, client) {
 		if (에러) return console.log(에러);
 		db = client.db("petpy_db");
-		db.collection("post").insertOne(
-			{ 이름: "John", 나이: 20 },
-			function (에러, 결과) {
-				console.log("저장완료");
-			}
-		);
 		app.listen(8080, function () {
 			console.log("listening on 8080");
 		});
@@ -52,4 +47,11 @@ app.post("/add", function (요청, 응답) {
 			console.log("저장완료");
 		}
 	);
+});
+
+app.get('/list', function (요청, 응답) {
+	db.collection('post').find().toArray(function (에러, 결과) {
+		console.log(결과);
+		응답.render('list.ejs', { posts: 결과 });
+	});
 });
