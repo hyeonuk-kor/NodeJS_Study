@@ -34,10 +34,10 @@ app.get("/beauty", function (요청, 응답) {
 });
 
 app.get("/", function (요청, 응답) {
-	응답.sendFile(__dirname + "/index.html");
+	응답.render("index.ejs");
 });
 app.get("/write", function (요청, 응답) {
-	응답.sendFile(__dirname + "/write.html");
+	응답.render("write.ejs");
 });
 
 app.post("/add", function (요청, 응답) {
