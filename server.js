@@ -12,8 +12,8 @@ const password = JSON.parse(jsonfile).value;
 let db;
 MongoClient.connect(
 	"mongodb+srv://hyeonuk:" +
-		password +
-		"@cluster0.2onwa9n.mongodb.net/?retryWrites=true&w=majority",
+	password +
+	"@cluster0.2onwa9n.mongodb.net/?retryWrites=true&w=majority",
 	function (에러, client) {
 		if (에러) return console.log(에러);
 		db = client.db("petpy_db");
@@ -85,5 +85,12 @@ app.delete("/delete", function (요청, 응답) {
 	db.collection("post").deleteOne(요청.body, function (에러, 결과) {
 		console.log("삭제완료");
 		응답.status(200).send({ message: "성공했습니다." });
+	});
+});
+
+app.get("/detail/:id", function (요청, 응답) {
+	db.collection('post').findOne({ _id: parseInt(요청.params.id) }, function (에러, 결과) {
+		console.log(결과);
+		응답.render('detail.ejs', { data: 결과 });
 	});
 });
