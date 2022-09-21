@@ -112,7 +112,6 @@ app.get("/edit/:id", function (요청, 응답) {
 });
 
 app.put("/edit", function (요청, 응답) {
-	// 폼에담긴 제목데이터, 날짜데이터를 가지고 db.collection에다가 업데이트함
 	db.collection("post").updateOne(
 		{ _id: parseInt(요청.body.id) },
 		{ $set: { 제목: 요청.body.title, 날짜: 요청.body.date } },
