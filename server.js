@@ -140,6 +140,17 @@ app.post(
 		응답.redirect("/");
 	}
 );
+app.get("/mypage", 로그인했니, function (요청, 응답) {
+	console.log(요청.user);
+	응답.render("mypage.ejs", { 사용자: 요청.user });
+});
+function 로그인했니(요청, 응답, next) {
+	if (요청.user) {
+		next();
+	} else {
+		응답.send("로그인안하셨는데요?");
+	}
+}
 passport.use(
 	new LocalStrategy(
 		{
@@ -175,5 +186,8 @@ passport.serializeUser(function (user, done) {
 });
 
 passport.deserializeUser(function (아이디, done) {
-	done(null, {});
+	// 디비에서 위에있는 user.id로 유저를 찾은 뒤에 유저 정보를 아래 결과에 넣음
+	db.collection("login").findOne({ id: 아이디 }, function (에러, 결과) {
+		done(null, 결과);
+	});
 });
