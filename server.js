@@ -13,18 +13,13 @@ require("dotenv").config();
 const jsonfile = fs.readFileSync("./password.json");
 const password = JSON.parse(jsonfile).value;
 let db;
-MongoClient.connect(
-	"mongodb+srv://hyeonuk:" +
-		password +
-		"@cluster0.2onwa9n.mongodb.net/?retryWrites=true&w=majority",
-	function (에러, client) {
-		if (에러) return console.log(에러);
-		db = client.db("petpy_db");
-		app.listen(8080, function () {
-			console.log("listening on 8080");
-		});
-	}
-);
+MongoClient.connect(process.env.DB_URL, function (에러, client) {
+	if (에러) return console.log(에러);
+	db = client.db("petpy_db");
+	app.listen(8080, function () {
+		console.log("listening on 8080");
+	});
+});
 
 // 누군가 /pet으로 방문하면 pet관련된 안내문을 띄워주자.
 app.get("/pet", function (요청, 응답) {
