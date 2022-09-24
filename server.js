@@ -221,3 +221,7 @@ app.delete("/delete", function (요청, 응답) {
 		응답.status(200).send({ message: "성공했습니다." });
 	});
 });
+
+app.use("/shop", require("./routes/shop.js")); // 미들웨어를 쓰고 싶을 때 use 사용, / 경로로 요청했을 때 라우터 적용~
+
+app.use("/board/sub", require("./routes/board.js"));
