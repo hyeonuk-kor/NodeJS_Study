@@ -14,8 +14,8 @@ let db;
 MongoClient.connect(process.env.DB_URL, function (에러, client) {
 	if (에러) return console.log(에러);
 	db = client.db("petpy_db");
-	app.listen(process.env.PORT, function () {
-		console.log("listening on " + process.env.PORT);
+	app.listen(8080, function () {
+		console.log("listening on " + 8080);
 	});
 });
 
