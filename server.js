@@ -35,36 +35,6 @@ app.get("/write", function (요청, 응답) {
 	응답.render("write.ejs");
 });
 
-app.post("/add", function (요청, 응답) {
-	응답.send("전송완료");
-	db.collection("counter").findOne(
-		{ name: "게시물갯수" },
-		function (에러, 결과) {
-			console.log(결과.totalPost);
-			var 총게시물갯수 = 결과.totalPost;
-			db.collection("post").insertOne(
-				{
-					_id: 총게시물갯수 + 1,
-					제목: 요청.body.title,
-					날짜: 요청.body.date,
-				},
-				function () {
-					console.log("저장완료");
-					db.collection("counter").updateOne(
-						{ name: "게시물갯수" },
-						{ $inc: { totalPost: 1 } }, // operator 써야함
-						function (에러, 결과) {
-							if (에러) {
-								return console.log(에러);
-							}
-						}
-					);
-				}
-			);
-		}
-	);
-});
-
 app.get("/list", function (요청, 응답) {
 	db.collection("post")
 		.find()
@@ -98,15 +68,6 @@ app.get("/search", (요청, 응답) => {
 			console.log(결과);
 			응답.render("search.ejs", { posts: 결과 });
 		});
-});
-
-app.delete("/delete", function (요청, 응답) {
-	console.log(요청.body);
-	요청.body._id = parseInt(요청.body._id);
-	db.collection("post").deleteOne(요청.body, function (에러, 결과) {
-		console.log("삭제완료");
-		응답.status(200).send({ message: "성공했습니다." });
-	});
 });
 
 app.get("/detail/:id", function (요청, 응답) {
@@ -217,4 +178,46 @@ app.post("/register", (요청, 응답) => {
 			응답.redirect("/");
 		}
 	);
+});
+
+app.post("/add", function (요청, 응답) {
+	응답.send("전송완료");
+	db.collection("counter").findOne(
+		{ name: "게시물갯수" },
+		function (에러, 결과) {
+			console.log(결과.totalPost);
+			var 총게시물갯수 = 결과.totalPost;
+			var 저장할거 = {
+				_id: 총게시물갯수 + 1,
+				작성자: 요청.user._id,
+				제목: 요청.body.title,
+				날짜: 요청.body.date,
+			};
+			db.collection("post").insertOne(저장할거, function () {
+				console.log("저장완료");
+				db.collection("counter").updateOne(
+					{ name: "게시물갯수" },
+					{ $inc: { totalPost: 1 } }, // operator 써야함
+					function (에러, 결과) {
+						if (에러) {
+							return console.log(에러);
+						}
+					}
+				);
+			});
+		}
+	);
+});
+
+app.delete("/delete", function (요청, 응답) {
+	console.log("삭제할 데이터는?");
+	console.log(요청.body);
+	요청.body._id = parseInt(요청.body._id);
+	var 삭제할데이터 = { _id: 요청.body._id, 작성자: 요청.user._id };
+	console.log(삭제할데이터);
+	db.collection("post").deleteOne(삭제할데이터, function (에러, 결과) {
+		console.log("삭제완료");
+		if (에러) console.log(에러);
+		응답.status(200).send({ message: "성공했습니다." });
+	});
 });
