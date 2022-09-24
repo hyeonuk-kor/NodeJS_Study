@@ -77,9 +77,23 @@ app.get("/list", function (요청, 응답) {
 
 app.get("/search", (요청, 응답) => {
 	//console.log(요청.query.value);
-	if (요청.query.value == "") 응답.redirect("/list");
+	var 검색조건 = [
+		{
+			$search: {
+				index: "titleSearch",
+				text: {
+					query: 요청.query.value,
+					path: "제목", // 제목날짜 둘다 찾고 싶으면 ['제목', '날짜']
+				},
+			},
+		},
+		{ $sort: { _id: 1 } },
+		{ $limit: 2 },
+		/*
+		{ $project: { 제목: 1, _id: 0, score: { $meta: "searchScore" } } }, //내가 원하는 것만 보여줌 */
+	];
 	db.collection("post")
-		.find({ 제목: 요청.query.value })
+		.aggregate(검색조건)
 		.toArray((에러, 결과) => {
 			console.log(결과);
 			응답.render("search.ejs", { posts: 결과 });
@@ -194,4 +208,13 @@ passport.deserializeUser(function (아이디, done) {
 	db.collection("login").findOne({ id: 아이디 }, function (에러, 결과) {
 		done(null, 결과);
 	});
+});
+
+app.post("/register", (요청, 응답) => {
+	db.collection("login").insertOne(
+		{ id: 요청.body.id, pw: 요청.body.pw },
+		(에러, 결과) => {
+			응답.redirect("/");
+		}
+	);
 });
