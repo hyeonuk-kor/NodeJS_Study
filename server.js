@@ -10,8 +10,6 @@ app.use(methodOverride("_method"));
 app.set("view engine", "ejs");
 app.use("/public", express.static("public"));
 require("dotenv").config();
-const jsonfile = fs.readFileSync("./password.json");
-const password = JSON.parse(jsonfile).value;
 let db;
 MongoClient.connect(process.env.DB_URL, function (에러, client) {
 	if (에러) return console.log(에러);
