@@ -226,6 +226,37 @@ app.use("/shop", require("./routes/shop.js")); // 미들웨어를 쓰고 싶을 
 
 app.use("/board/sub", require("./routes/board.js"));
 
+let multer = require("multer");
+var storage = multer.diskStorage({
+	destination: function (req, file, cb) {
+		cb(null, "./public/image");
+	},
+	filename: function (req, file, cb) {
+		cb(null, file.originalname);
+	},
+});
+var path = require("path");
+
+var upload = multer({
+	storage: storage,
+	fileFilter: function (req, file, callback) {
+		var ext = path.extname(file.originalname);
+		if (ext !== ".png" && ext !== ".jpg" && ext !== ".jpeg") {
+			return callback(new Error("PNG, JPG만 업로드하세요"));
+		}
+		callback(null, true);
+	},
+	limits: {
+		fileSize: 1024 * 1024,
+	},
+});
 app.get("/upload", (요청, 응답) => {
 	응답.render("upload.ejs");
+});
+app.post("/upload", upload.single("profile"), (요청, 응답) => {
+	응답.send("업로드완료");
+});
+
+app.get("/image/:imageName", (요청, 응답) => {
+	응답.sendFile(__dirname + "/public/image/" + 요청.params.imageName);
 });
